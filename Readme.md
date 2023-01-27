@@ -1,10 +1,9 @@
 # Weather API
 
-This API allows you to access weather and yield data for various locations and years. The data can be filtered by date and location. The API also provides statistical information on the weather data.
+This API allows you to access weather data for various locations and years. The data can be filtered by date and location. The API also provides statistical information on the weather data.
 
 ## Features
 - Retrieve weather data for a specific date and location
-- Retrieve yield data for a specific year
 - Retrieve statistical information on the weather data, including the maximum, minimum, and total precipitation for a specific date and location
 
 
@@ -30,7 +29,11 @@ python -m flask create
 ```
 - The API can now be accessed at http://localhost:5000.
 
-### Endpoints
+# Endpoints
+
+## **Swagger**
+[http://localhost:5000/swagger/](http://localhost:5000/swagger/)
+
 ##### Weather data
 ```
 GET /api/weather/
@@ -39,11 +42,6 @@ This endpoint returns a paginated list of weather records. You can filter the re
 ```
 GET /api/weather/?date=19850103&station=USC00257715
 ```
-##### Yield data
-```
-GET /api/yield/
-```
-This endpoint returns a paginated list of yield records
 ##### Statistics
 ```
 GET /api/weather/stats/
@@ -69,3 +67,7 @@ This endpoint returns statistical information about the weather data. You can fi
 ```bash
 pytest -v
 ```
+
+
+# Deployment
+The approach would involve using Amazon ECS to deploy the Flask API, Amazon RDS for the database, Amazon S3 for storing the data, AWS Glue for data ingestion and scheduling the ingestion job, AWS CloudWatch for monitoring and logging, AWS Elastic Container Registry (ECR) for storing the container image, and Application Load Balancer for routing the traffic. This would provide a scalable, durable, and fully managed solution for deploying the Flask API, database, and scheduled data ingestion code on AWS.

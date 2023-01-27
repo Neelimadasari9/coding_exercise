@@ -49,42 +49,6 @@ def ingest_wx_data():
     print("data inserted")
 
 
-def read_yld():
-    print("Reading yld Data...")
-    harvest = []
-    path = f"{os.getcwd()}/yld_data"
-    from .app import YieldRecord
-
-    for file in os.listdir(path):
-        if file.endswith(".txt"):
-            fpath = f"{path}/{file}"
-            with open(fpath, "r") as data:
-                lines = [line.rstrip() for line in data]
-                for line in lines:
-                    temp = line.split("\t")
-                    h = YieldRecord(year=int(temp[0]), harvested_val=int(temp[1]))
-                    harvest.append(h)
-    return harvest
-
-
-def ingest_yld_data():
-    initial_time = datetime.datetime.now()
-    harvest = read_yld()
-    from .app import db
-
-    s = db.session
-    print("data saving to database ........")
-    s.bulk_save_objects(harvest)
-    s.commit()
-    print("data inserted")
-    logger.info("Harvest data loaded...")
-    completion_time = datetime.datetime.now()
-
-    logger.info(
-        f"Harvest Data inserted in : {(completion_time-initial_time).total_seconds()} secs \t Total rows: {len(harvest)}"
-    )
-
-
 def generate_statistics():
     from .app import db
 

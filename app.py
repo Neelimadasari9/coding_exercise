@@ -3,23 +3,37 @@ from flask import Flask
 from flask import jsonify
 from flask import request
 from flask_sqlalchemy import SQLAlchemy
-
+from flask_swagger_ui import get_swaggerui_blueprint
 try:
     from .ingest import (
         generate_statistics,
-        ingest_yld_data,
         ingest_wx_data,
     )
 except Exception:
     from ingest import (
         generate_statistics,
-        ingest_yld_data,
         ingest_wx_data,
     )
 
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///example2.sqlite"
+
+
+# flask swagger configs
+SWAGGER_URL = '/swagger'
+API_URL = '/static/swagger.json'
+SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name': "Todo List API"
+    }
+)
+app.register_blueprint(SWAGGERUI_BLUEPRINT, url_prefix=SWAGGER_URL)
+
+
+
 db = SQLAlchemy(app)
 
 
@@ -40,16 +54,6 @@ class WeatherRecord(db.Model):
             "minimum_temperature": self.minimum_temperature,
             "precipitation": self.precipitation,
         }
-
-
-class YieldRecord(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    year = db.Column(db.String(4))
-    harvested_val = db.Column(db.Integer)
-
-    @property
-    def serialize(self):
-        return {"year": self.year, "harvested_val": self.harvested_val}
 
 
 class Statistic(db.Model):
@@ -77,7 +81,6 @@ def create():
         db.drop_all()
         db.create_all()
         ingest_wx_data()
-        ingest_yld_data()
         generate_statistics()
 
 
@@ -95,12 +98,6 @@ def weather_home():
     return jsonify([r.serialize for r in result.paginate(page=page, per_page=100)])
 
 
-@app.route("/api/yield/", methods=["GET"])
-def yield_home():
-    page = request.args.get("page", type=int)
-    return jsonify(
-        [r.serialize for r in YieldRecord.query.paginate(page=page, per_page=100)]
-    )
 
 
 @app.route("/api/weather/stats/", methods=["GET"])
